@@ -1,0 +1,34 @@
+
+
+<video poster="https://school.demo.moodle.net/pluginfile.php/1036/mod_label/intro/handstogether2.png" controls="true" data-setup-lazy="testVideo" id="videoElement" class="video-js" title="I%20have%20a%20dream%21.mp4">
+  <source src="https://fltrc.biz/moodle/draftfile.php/5/user/draft/848096644/I%20have%20a%20dream%21.mp4?time=1548389019661" type="video/mp4">
+  <track src="https://fltrc.biz/moodle/draftfile.php/5/user/draft/848096644/EnglishSubttiles.vtt?time=1548389180723" kind="subtitles" srclang="en" label="English" default="true">
+  https://school.demo.moodle.net/pluginfile.php/1036/mod_label/intro/I%20have%20a%20dream%21.mp4
+</video>
+
+<pre data-placeholder="Перевод" id="tw-target-text" data-fulltext="" dir="ltr">Watch the video &amp; speak any of the lines.</pre>
+<p></p>
+
+
+<p>
+
+</p>
+<p>
+    <a href="#" class="goToVideo" data-value="0">I have a dream that my four little children will one day live in a nation where they will not be judged by the colour of their skin but by the content of their character.</a>
+    <br>
+    <a href="#" class="goToVideo" data-value="11">I have a dream today</a>
+    <!--<a href="#" id="CurrentTimeBTN">Current Time</a>-->
+</p>
+
+
+<script>
+    var video = document.getElementsByTagName('video');
+    video = video[0]
+    setInterval(function(){
+        $('.goToVideo').click(function() {
+            video.currentTime = $(this).attr("data-value");
+            video.play();
+        });
+    }, 1000);
+</script>
+<p></p>
