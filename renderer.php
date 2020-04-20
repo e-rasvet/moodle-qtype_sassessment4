@@ -208,7 +208,7 @@ class qtype_sassessment_renderer extends qtype_renderer {
                 'amazon_region' => $config->amazon_region,
                 'amazon_accessid' => $config->amazon_accessid,
                 'amazon_secretkey' => $config->amazon_secretkey,
-                //'onclick' => 'recBtn(event);',
+                'onclick' => 'recBtn(event);',
                 'type' => 'button',
                 'options' => json_encode(array(
                     'repo_id' => $this->get_repo_id(),
@@ -239,13 +239,13 @@ class qtype_sassessment_renderer extends qtype_renderer {
 
 
             if ($config->stt_core == "amazon") {
-                //$result .= html_writer::script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js");
+                $result .= html_writer::script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js");
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/lame.js'));
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/main.js'));
             } else if ($config->stt_core == "google"){
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/recorder.js'));
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/main.js'));
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/Mp3LameEncoder.min.js'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/recorder.js'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/main.js'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/Mp3LameEncoder.min.js'));
             }
 
         }
@@ -292,25 +292,26 @@ class qtype_sassessment_renderer extends qtype_renderer {
                     $result .= html_writer::end_tag('div');
                 }
             }
+        }
 
 
+        /*
+         * IOS app integration code START
+         */
+        /*
+         * This code works with voiceshadow module only!
+         */
+        if (function_exists("voiceshadow_is_ios") && $config->stt_core == "google")
+            if (voiceshadow_is_ios() && !$options->readonly && file_exists($CFG->dirroot.'/mod/voiceshadow/ajax-apprecord.php')) {
+                $time = time();
+                $result .= html_writer::start_tag("a", array("href" => 'voiceshadow://?link='.$CFG->wwwroot.'&id='.$options->context->id.'&uid='.$USER->id.'&time='.$time.'&fid='.$question->id.'&var=0&audioBtn=1&sstBtn=1&type=voiceshadow&mod=voiceshadow', "id" => "id_recoring_link",  //
+                    "onclick" => 'formsubmit(this.href)'));
 
-            if ($config->stt_core == "google"){
-
-                /*
-                 * IOS app integration code START
-                 */
-                if (function_exists("voiceshadow_is_ios"))
-                    if (voiceshadow_is_ios() && !$options->readonly && file_exists($CFG->dirroot.'/mod/voiceshadow/ajax-apprecord.php')) {
-                        $time = time();
-                        $result .= html_writer::start_tag("a", array("href" => 'voiceshadow://?link='.$CFG->wwwroot.'&id='.$options->context->id.'&uid='.$USER->id.'&time='.$time.'&fid='.$question->id.'&var=0&audioBtn=1&sstBtn=1&type=voiceshadow&mod=voiceshadow', "id" => "id_recoring_link",  //
-                            "onclick" => 'formsubmit(this.href)'));
-
-                        $result .= get_string('recordAudioIniosapp', 'qtype_sassessment');
-                        $result .= html_writer::end_tag('a');
+                $result .= get_string('recordAudioIniosapp', 'qtype_sassessment');
+                $result .= html_writer::end_tag('a');
 
 
-                        $PAGE->requires->js_amd_inline('
+                $PAGE->requires->js_amd_inline('
 require(["jquery"], function(min) {
     $(function() {
         $.get( "'.$CFG->wwwroot.'/mod/voiceshadow/ajax-apprecord.php", { id: '.$question->id.', inst: '.$options->context->id.', uid: '.$USER->id.' }, function(json){
@@ -353,13 +354,10 @@ require(["jquery"], function(min) {
 });
 ');
 
-                        /*
-                         * IOS app integration code END
-                         */
-
-                    }
-        }
-
+                /*
+                 * IOS app integration code END
+                 */
+            }
 
 
         $PAGE->requires->js_amd_inline('

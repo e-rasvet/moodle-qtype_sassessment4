@@ -105,6 +105,9 @@ function recBtn(ev) {
         recStatus[id].ans = document.getElementById(btn.getAttribute('answername'));
         recStatus[id].ansDiv = document.getElementById(btn.getAttribute('answerDiv'));
         recStatus[id].grade = document.getElementById(btn.getAttribute('gradename'));
+        recStatus[id].mediaelement = document.getElementById(btn.getAttribute('mediaelement'));
+        recStatus[id].medianame = document.getElementById(btn.getAttribute('medianame'));
+        recStatus[id].mediapercent = btn.getAttribute('mediapercent');
         recStatus[id].onresult = function (e) {
             var interim_transcript = '';
 
@@ -139,11 +142,24 @@ function recBtn(ev) {
                 var opts = JSON.parse(btn.getAttribute('options'));
                 uploadFile(blob, opts.repo_id, opts.itemid, opts.title, opts.ctx_id, btn);
             });
+
             var grade = this.grade;
+            var medianame = this.medianame;
+            var mediapercent = this.mediapercent;
+            var mediaelement = this.mediaelement;
+
             this.grade.value = 'Updating...';
+
             $.post(typeRoot + "/ajax-score.php", {qid: this.qid, ans: this.ans.value},
                 function (data) {
                     grade.value = JSON.parse(data).gradePercent;
+
+                    if (parseInt(grade.value) >= parseInt(mediapercent)){
+                        medianame.style.display = "block";
+                        mediaelement.play();
+                    } else {
+                        console.log("No feedback: " + grade.value + " / " + mediapercent);
+                    }
                 });
             recStatus[this.btn.id] = null;
         }
