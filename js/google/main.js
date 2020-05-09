@@ -1,7 +1,7 @@
 var typeRoot = M.cfg.wwwroot + "/question/type/sassessment";
 
 Mp3LameEncoderConfig = {
-    memoryInitializerPrefixURL: typeRoot + "/js/",
+    memoryInitializerPrefixURL: typeRoot + "/js/google/",
     TOTAL_MEMORY: 1073741824 / 4,
 }
 
@@ -12,6 +12,8 @@ var audio_stream;
 var recs = 0;
 var speechLang = 'en';
 var dotsCount = 1;
+var recordingBtnText;
+var colorFlashBtn = "white";
 
 function uploadFile(file, repo_id, itemid, title, ctx_id, btn) {
     var xhr = new XMLHttpRequest();
@@ -30,9 +32,21 @@ function uploadFile(file, repo_id, itemid, title, ctx_id, btn) {
         if (xhr.readyState == 4) {
             var audioname = this.btn.getAttribute('audioname');
             document.getElementById(audioname).src = JSON.parse(xhr.responseText).url + '?' + Date.now();
-            this.btn.innerText = 'Start recording';
+            this.btn.innerHTML = '<i class="fa fa-microphone"></i> Start';
+            this.btn.className = "srecordingBTN button-xl";
+            this.btn.removeAttribute("disabled");
         }
     }
+    xhr.upload.addEventListener("progress", function(evt) {
+        if (evt.lengthComputable) {
+            var percentComplete = evt.loaded / evt.total;
+            percentComplete = parseInt(percentComplete * 100);
+            xhr.btn.innerHTML = '<i class="fa fa-upload" style="background: linear-gradient(to top, white '+percentComplete+'%, #a4c9e9 '+percentComplete+'% 100%);\n' +
+                '    -webkit-background-clip: text;\n' +
+                '    -webkit-text-fill-color: transparent;\n' +
+                '    display: initial;"></i>  Uploading... ('+percentComplete+'%)';
+        }
+    }, false);
     xhr.send(formdata);
 }
 
@@ -82,6 +96,10 @@ function stopRecording(callback) {
 
 function recBtn(ev) {
 
+    console.log("Event Started");
+
+    audio_context = new AudioContext();
+
     var btn = ev.target;
     var id = btn.name;
 
@@ -92,8 +110,9 @@ function recBtn(ev) {
         recStatus[id] = null;
 
     if (recStatus[id] === null) {
-        if (btn.innerText != 'Start recording' || recs > 0)
+        if (recs > 0)  // btn.innerText != 'Start recording' ||
             return;
+
         recs++;
 
         recStatus[id] = new webkitSpeechRecognition();
@@ -132,13 +151,19 @@ function recBtn(ev) {
         }
 
         recStatus[id].onend = function (e) {
-            this.btn.style.color = "black";
+            //this.btn.style.color = "black";
             clearInterval(recordingBtnText);
-            this.btn.innerText = 'Encoding...';
+            colorFlashBtn = "white";
+
+            this.btn.innerHTML = '<i class="fa fa-stop-circle"></i> Encoding...';
             var btn = this.btn;
+
+            btn.className = "srecordingBTN button-xl";
+            btn.setAttribute("disabled", true);
+
             stopRecording(function (blob) {
                 recs--;
-                btn.innerText = 'Uploading...';
+                btn.innerHTML = '<i class="fa fa-stop-circle"></i> Uploading...';
                 var opts = JSON.parse(btn.getAttribute('options'));
                 uploadFile(blob, opts.repo_id, opts.itemid, opts.title, opts.ctx_id, btn);
             });
@@ -154,7 +179,7 @@ function recBtn(ev) {
                 function (data) {
                     grade.value = JSON.parse(data).gradePercent;
 
-                    if (parseInt(grade.value) >= parseInt(mediapercent)){
+                    if ((parseInt(grade.value) >= parseInt(mediapercent)) && mediapercent != 0){
                         medianame.style.display = "block";
                         mediaelement.play();
                     } else {
@@ -166,30 +191,31 @@ function recBtn(ev) {
 
         recStatus[id].start();
         startRecording();
-        btn.innerText = 'Stop recording';
+        btn.className = "srecordingBTN button-xl-rec";
+        btn.innerHTML = '<i class="fa fa-stop-circle"></i> Stop';
 
-        var recordingBtnText = setInterval(function () {
-            var text = 'Stop recording. Recording';
-            var dotsText = "";
+        recordingBtnText = setInterval(function () {
+                    var text = 'Stop';
+                    var dotsText = "";
 
-            for (i = 1; i <= dotsCount; i++) {
-                dotsText = dotsText + ".";
-            }
+                    for (var i = 1; i <= dotsCount; i++) {
+                        dotsText = dotsText + ".";
+                    }
 
-            if (btn.style.color != "red") {
-                btn.style.color = "red";
-            } else {
-                btn.style.color = "black";
-            }
+                    if (colorFlashBtn != "white") {
+                        colorFlashBtn = "white";
+                    } else {
+                        colorFlashBtn = "brown";
+                    }
 
-            btn.innerText = text + dotsText;
+                    btn.innerHTML = '<i class="fa fa-stop-circle" style="color:'+colorFlashBtn+'"></i> ' + text + dotsText;
 
-            if (dotsCount > 4) {
-                dotsCount = 1;
-            } else {
-                dotsCount++;
-            }
-        }, 500);
+                    if (dotsCount > 4) {
+                        dotsCount = 1;
+                    } else {
+                        dotsCount++;
+                    }
+                }, 500);
 
         recStatus[id].ans.value = '';
         recStatus[id].grade.value = '';
@@ -229,7 +255,7 @@ window.onload = function () {
         window.URL = window.URL || window.webkitURL;
 
         // Store the instance of AudioContext globally
-        audio_context = new AudioContext;
+        //audio_context = new AudioContext;
         console.log('Audio context is ready !');
         console.log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
     } catch (e) {

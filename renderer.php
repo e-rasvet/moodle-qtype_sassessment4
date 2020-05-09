@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/lib.php');
 
+
 /**
  * Generates the output for sassessment questions.
  *
@@ -161,20 +162,7 @@ class qtype_sassessment_renderer extends qtype_renderer {
                 $audioDisplayStatus = "display:none";
             }
 
-            if (!$options->readonly) {
-
-                $result .= html_writer::start_tag('div', array('class' => 'ablock form-inline'));
-                /*
-                 * Disable target response
-                 */
-/*                $result .= html_writer::tag('label', get_string('targetresponse', 'qtype_sassessment',
-                $sampleResponses . html_writer::tag('span', $input, array('class' => 'answer'))),
-                    array('for' => $inputattributes['id'], 'style' => $answerDisplayStatus)); */
-                $result .= html_writer::tag('label', html_writer::tag('span', $input, array('class' => 'answer')),
-                    array('for' => $inputattributes['id'], 'style' => $answerDisplayStatus));
-                $result .= html_writer::end_tag('div');
-
-            }
+            /* Answer Div old position */
         }
 
         $config = get_config('qtype_sassessment');
@@ -195,7 +183,7 @@ class qtype_sassessment_renderer extends qtype_renderer {
             $btnattributes = array(
                 'name' => $btnname,
                 'id' => $btnname,
-                'class' => 'srecordingBTN',
+                'class' => 'srecordingBTN button-xl',
                 'size' => 80,
                 'qid' => $question->id,
                 'answername' => $answername,
@@ -219,7 +207,11 @@ class qtype_sassessment_renderer extends qtype_renderer {
                 'audioname' => $audioname,
             );
 
-            $btn = html_writer::tag('button', get_string("startrecording", 'qtype_sassessment'), $btnattributes);
+            $btn  = html_writer::start_tag('button', $btnattributes);
+            $btn .= html_writer::tag('i', "", array('class' => 'fa fa-microphone'));
+            $btn .= " " . get_string("startrecording", 'qtype_sassessment');
+            $btn .= html_writer::end_tag('button');
+
             $audio = html_writer::empty_tag('audio', array('src' => ''));
 
             $result .= html_writer::start_tag('div', array('class' => 'ablock'));
@@ -228,6 +220,23 @@ class qtype_sassessment_renderer extends qtype_renderer {
             $result .= html_writer::empty_tag('input', array('type' => 'hidden',
                 'name' => $qa->get_qt_field_name('attachments'), 'value' => $itemid));
             $result .= html_writer::end_tag('div');
+
+
+            if (!$options->readonly) {
+
+                $result .= html_writer::start_tag('div', array('class' => 'ablock form-inline'));
+                /*
+                 * Disable target response
+                 */
+                /*                $result .= html_writer::tag('label', get_string('targetresponse', 'qtype_sassessment',
+                                $sampleResponses . html_writer::tag('span', $input, array('class' => 'answer'))),
+                                    array('for' => $inputattributes['id'], 'style' => $answerDisplayStatus)); */
+                $result .= html_writer::tag('label', html_writer::tag('span', $input, array('class' => 'answer')),
+                    array('for' => $inputattributes['id'], 'style' => $answerDisplayStatus));
+                $result .= html_writer::end_tag('div');
+
+            }
+
 
             $result .= html_writer::start_tag('div', array('class' => 'ablock', 'style' => $audioDisplayStatus));
             $result .= html_writer::empty_tag('audio', array('id' => $audioname, 'name' => $audioname, 'controls' => ''));
@@ -241,10 +250,10 @@ class qtype_sassessment_renderer extends qtype_renderer {
             if ($config->stt_core == "amazon") {
                 $result .= html_writer::script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js");
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/lame.js'));
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/main.js'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/main.js?4'));
             } else if ($config->stt_core == "google"){
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/recorder.js'));
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/main.js'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/main.js?4'));
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/Mp3LameEncoder.min.js'));
             }
 
@@ -421,7 +430,7 @@ require(["jquery"], function(min) {
         $question = $qa->get_question();
         $ans = $qa->get_last_qt_var('answer');
         $grade = qtype_sassessment_compare_answer($ans, $qa->get_question()->id);
-        $grade['gradePercent'] = $qa->get_last_qt_var('grade');
+        $grade['gradePercent'] = $qa->get_last_qt_var('grade');  /*  Change grade??!! */
 
         $result = '';
         $result .= html_writer::start_tag('div', array('class' => 'ablock'));
@@ -488,7 +497,7 @@ require(["jquery"], function(min) {
             //$result .= html_writer::tag('style', "del{display:none}ins{color:red;background:#fdd;text-decoration:none}");
         }
 
-        if (!empty($grade['answer']) && !empty($ans)) {
+        if (!empty($grade['answer']) && !empty($grade['answerSource'])) {
             $grade['answer'] = str_replace(".", " ", $grade['answer']);
             $ans = str_replace(".", " ", $ans);
 
@@ -496,13 +505,13 @@ require(["jquery"], function(min) {
             //$to_str = preg_replace('/[^A-Za-z0-9] /i', '', strtolower($ans));
 
             //$from_str = preg_replace('/[^a-zA-Z\s]+/', '', $grade['answer']);
-            $from_str = str_replace(array("!","?",".",","), ' ', $grade['answer']);
+            $from_str = str_replace(array("!","?",".",","), ' ', $grade['answerSource']);
             $from_str = preg_replace('!\s+!', ' ', $from_str);
             $from_str = trim(strtolower($from_str));
 
 
             //$to_str = preg_replace('/[^a-zA-Z\s]+/', '', $ans);
-            $to_str = str_replace(array("!","?",".",","), ' ', $ans);
+            $to_str = str_replace(array("!","?",".",","), ' ', $grade['answer']);
             $to_str = preg_replace('!\s+!', ' ', $to_str);
             $to_str = trim(strtolower($to_str));
 

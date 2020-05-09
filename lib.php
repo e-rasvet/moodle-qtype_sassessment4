@@ -53,7 +53,7 @@ function qtype_sassessment_pluginfile($course, $cm, $context, $filearea, $args, 
  * @param bool $get
  * @return array
  */
-function qtype_sassessment_compare_answer($ans, $qid, $get = true) {
+function qtype_sassessment_compare_answer($ans, $qid) {
   global $DB, $CFG;
 
   $maxp = 0;
@@ -97,8 +97,7 @@ function qtype_sassessment_compare_answer($ans, $qid, $get = true) {
     "grade" => round($maxpF/100, 2),
   );
 
-  if ($get)
-    $result["answer"] = $maxtext;
+  $result["answerSource"] = $maxtext;
 
   if (empty($allSampleResponses)) {
       $result["gradePercent"] = 100;

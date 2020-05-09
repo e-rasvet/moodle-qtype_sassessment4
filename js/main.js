@@ -199,6 +199,9 @@ var socketError = false;
 var transcribeException = false; // check to see if the browser allows mic access
 var recStatus = [];
 var activeRecID = 0;
+var dotsCount = 1;
+var recordingBtnText;
+var colorFlashBtn = "white";
 
 if (!window.navigator.mediaDevices.getUserMedia) {
   // Use our helper method to show an error on the page
@@ -226,9 +229,22 @@ if (!window.navigator.mediaDevices.getUserMedia) {
                 var audioname = this.btn.getAttribute('audioname');
                 document.getElementById(audioname).src = JSON.parse(xhr.responseText).url + '?' + Date.now();
                 //document.getElementById(recStatus[activeRecID].audioname).src + '?' + Date.now();
-                this.btn.innerText = 'Start recording';
+                this.btn.innerHTML = '<i class="fa fa-microphone"></i> Start';
+                this.btn.className = "srecordingBTN button-xl";
+                this.btn.removeAttribute("disabled");
             }
         }
+        xhr.upload.addEventListener("progress", function(evt) {
+            if (evt.lengthComputable) {
+                var percentComplete = evt.loaded / evt.total;
+                percentComplete = parseInt(percentComplete * 100);
+                xhr.btn.innerHTML = '<i class="fa fa-upload" style="background: linear-gradient(to top, white '+percentComplete+'%, #a4c9e9 '+percentComplete+'% 100%);\n' +
+                    '    -webkit-background-clip: text;\n' +
+                    '    -webkit-text-fill-color: transparent;\n' +
+                    '    display: initial;"></i>  Uploading... ('+percentComplete+'%)';
+            }
+        }, false);
+
         xhr.send(formdata);
     }
 
@@ -263,8 +279,35 @@ if (!window.navigator.mediaDevices.getUserMedia) {
 
         if (recStatus[id].status == 0) {
 
-            btn.innerText = "Stop recording. Recording...";
-            btn.style.color = "red";
+            btn.innerHTML = "<i class=\"fa fa-microphone\"></i> Get ready...";
+
+            setTimeout(function() {
+                btn.innerHTML = "<i class=\"fa fa-stop-circle\"></i> Stop";
+                btn.className = "srecordingBTN button-xl-rec";
+
+                recordingBtnText = setInterval(function () {
+                    var text = 'Stop';
+                    var dotsText = "";
+
+                    for (var i = 1; i <= dotsCount; i++) {
+                        dotsText = dotsText + ".";
+                    }
+
+                    if (colorFlashBtn != "white") {
+                        colorFlashBtn = "white";
+                    } else {
+                        colorFlashBtn = "brown";
+                    }
+
+                    btn.innerHTML = '<i class="fa fa-stop-circle" style="color:'+colorFlashBtn+'"></i> ' + text + dotsText;
+
+                    if (dotsCount > 4) {
+                        dotsCount = 1;
+                    } else {
+                        dotsCount++;
+                    }
+                }, 500);
+            }, 1500);
 
             /*
             Init mp3 encoding
@@ -305,44 +348,15 @@ if (!window.navigator.mediaDevices.getUserMedia) {
             $(recStatus[activeRecID].ansDiv).text("");
             transcription = "";
 
-/*
-            var recordingBtnText = setInterval(function () {
-                if (recStatus[id] == null) {
-                    clearInterval(recordingBtnText);
-                }
-
-                console.log("Interval Called");
-                var text = 'Stop recording. Recording';
-                var dotsText = "";
-                var i = 1;
-                var dotsCount = 1;
-
-                for (i = 1; i <= dotsCount; i++) {
-                    dotsText = dotsText + ".";
-                }
-
-                if (recStatus[id].btn.style.color != "red") {
-                    recStatus[id].btn.style.color = "red";
-                } else {
-                    recStatus[id].btn.style.color = "black";
-                }
-
-                recStatus[id].btn.innerText = text + dotsText;
-
-                if (dotsCount > 4) {
-                    dotsCount = 1;
-                } else {
-                    dotsCount++;
-                }
-            }, 500);
-
- */
 
         } else {
-            //clearInterval(recordingBtnText);
+            clearInterval(recordingBtnText);
 
-            btn.innerText = "Uploading...";
-            btn.style.color = "black";
+            btn.innerHTML = "<i class=\"fa fa-upload\"></i>  Uploading...";
+            btn.className = "srecordingBTN button-xl";
+            btn.setAttribute("disabled", true);
+            colorFlashBtn = "white";
+            //btn.style.color = "black";
 
             /*
             Mp3 encoding
@@ -376,25 +390,27 @@ if (!window.navigator.mediaDevices.getUserMedia) {
 
 
             recStatus[activeRecID].grade.value = 'Updating...';
-            $.post(typeRoot + "/ajax-score.php", {qid: recStatus[activeRecID].qid, ans: $(recStatus[activeRecID].ansDiv).text()},
-                function (data) {
-                    recStatus[activeRecID].grade.value = JSON.parse(data).gradePercent;
 
-                    if (parseInt(recStatus[activeRecID].grade.value) >= parseInt(recStatus[activeRecID].mediapercent)){
-                        recStatus[activeRecID].medianame.style.display = "block";
-                        recStatus[activeRecID].mediaelement.play();
-                    } else {
-                        console.log("No feedback: " + recStatus[activeRecID].grade.value + " / " + recStatus[activeRecID].mediapercent);
-                    }
+            setTimeout(function() {
+                $.post(typeRoot + "/ajax-score.php", {qid: recStatus[activeRecID].qid, ans: $(recStatus[activeRecID].ansDiv).text()},
+                    function (data) {
+                        recStatus[activeRecID].grade.value = JSON.parse(data).gradePercent;
 
-                    //console.log("Transcription: " + transcription);
-                    //console.log("Grade: " + recStatus[activeRecID].grade.value);
-                    //console.log("AnswerField: " + recStatus[activeRecID].ans.value);
-                    //console.log("TextDiv: " + $(recStatus[activeRecID].ansDiv).text());
+                        if ((parseInt(recStatus[activeRecID].grade.value) >= parseInt(recStatus[activeRecID].mediapercent)) && parseInt(recStatus[activeRecID].mediapercent) != 0){
+                            recStatus[activeRecID].medianame.style.display = "block";
+                            recStatus[activeRecID].mediaelement.play();
+                        } else {
+                            console.log("No feedback: " + recStatus[activeRecID].grade.value + " / " + recStatus[activeRecID].mediapercent);
+                        }
 
-                    recStatus[activeRecID] = null;
-                });
+                        //console.log("Transcription: " + transcription);
+                        //console.log("Grade: " + recStatus[activeRecID].grade.value);
+                        //console.log("AnswerField: " + recStatus[activeRecID].ans.value);
+                        //console.log("TextDiv: " + $(recStatus[activeRecID].ansDiv).text());
 
+                        recStatus[activeRecID] = null;
+                    });
+            }, 2500);
 
         }
 

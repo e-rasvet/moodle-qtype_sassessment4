@@ -65,7 +65,7 @@ $string['hardwords'] = 'Hard words';
 $string['hardwordspersent'] = 'Hard words %';
 $string['lexicaldensity'] = 'Lexical density';
 $string['fogindex'] = 'Fog index';
-$string['startrecording'] = 'Start recording';
+$string['startrecording'] = 'Start';
 
 $string['feedback'] = 'Feedback';
 $string['myanswer'] = 'My answer';
