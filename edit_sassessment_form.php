@@ -70,8 +70,12 @@ class qtype_sassessment_edit_form extends question_edit_form {
         $mform->addElement('textarea', 'immediatefeedback', get_string('immediatefeedback', 'qtype_sassessment'),
             array('rows' => 3, 'cols' => 65), $this->editoroptions);  // or editor
         $mform->setType('immediatefeedback', PARAM_RAW);
+
         // Using setValue() as setDefault() does not work for the editor class.
         //$element->setValue(array('text' => ''));
+
+        //$mform->addElement('filepicker', 'attachments', get_string('file'), null,
+        //    array('accepted_types' => '*'));
 
         $immediatefeedbackpercent = array_replace(array(0 => "No"), array_combine(range(70, 100, 5), range(70, 100, 5)) );
         $mform->addElement('select', 'immediatefeedbackpercent', '', $immediatefeedbackpercent);
