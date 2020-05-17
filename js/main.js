@@ -249,7 +249,8 @@ if (!window.navigator.mediaDevices.getUserMedia) {
     }
 
 
-
+    $( document ).ready(function() {
+    $(".srecordingBTN").unbind();
     $('.srecordingBTN').click(function (ev) {
 
         var btn = ev.target;
@@ -276,6 +277,8 @@ if (!window.navigator.mediaDevices.getUserMedia) {
             recStatus[id].options = btn.getAttribute('options');
             recStatus[id].status = 0;
         }
+
+        console.log(recStatus);
 
         if (recStatus[id].status == 0) {
 
@@ -322,6 +325,8 @@ if (!window.navigator.mediaDevices.getUserMedia) {
 
             window.sampleRate = audioCtx.sampleRate;
 
+            console.log("Sample rate: " + window.sampleRate);
+
             window.mp3encoder = new lamejs.Mp3Encoder(channels, window.sampleRate, kbps);
 
             $('#error').hide(); // hide any existing errors
@@ -367,7 +372,7 @@ if (!window.navigator.mediaDevices.getUserMedia) {
                 window.mp3Data.push(mp3buf)
             }
 
-            console.log(window.mp3encoder);
+            //console.log(window.mp3encoder);
 
             var blob = new Blob(window.mp3Data, {type: 'audio/mp3'});
             var url = URL.createObjectURL(blob);
@@ -414,6 +419,7 @@ if (!window.navigator.mediaDevices.getUserMedia) {
 
         }
 
+    });
     });
 
 
@@ -466,11 +472,17 @@ var streamAudioToWebSocket = function streamAudioToWebSocket(userMediaStream) {
 
   socket.onopen = function () {
     micStream.on('data', function (rawAudioChunk) {
-      // the audio stream is raw audio bytes. Transcribe expects PCM with additional metadata, encoded as binary
-      var binary = convertAudioToBinaryMessage(rawAudioChunk);
-      if (socket.OPEN) socket.send(binary);
+        // the audio stream is raw audio bytes. Transcribe expects PCM with additional metadata, encoded as binary
+        var binary = convertAudioToBinaryMessage(rawAudioChunk);
+        if (socket.OPEN) {
+            socket.send(binary);
+        }
     });
   }; // handle messages, errors, and close events
+
+    socket.onerror = function(error) {
+        console.log(`[socket error] ${error.message}`);
+    };
 
 
   wireSocketEvents();
@@ -568,7 +580,7 @@ $('#stop-button').click(function () {
         window.mp3Data.push(mp3buf)
     }
 
-    console.log(window.mp3encoder);
+    //console.log(window.mp3encoder);
 
     var blob = new Blob(window.mp3Data, {type: 'audio/mp3'});
     var url = URL.createObjectURL(blob);

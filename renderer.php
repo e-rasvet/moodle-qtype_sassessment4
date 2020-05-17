@@ -248,13 +248,16 @@ class qtype_sassessment_renderer extends qtype_renderer {
 
 
             if ($config->stt_core == "amazon") {
+                //$PAGE->requires->js( new moodle_url($CFG->wwwroot . '/question/type/sassessment/js/jquery.min.js') );
+                //$PAGE->requires->js( new moodle_url($CFG->wwwroot . '/question/type/sassessment/js/lame.js?1') );
+                //$PAGE->requires->js( new moodle_url($CFG->wwwroot . '/question/type/sassessment/js/main.js?5') );
                 $result .= html_writer::script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js");
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/lame.js'));
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/main.js?4'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/lame.js?1'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/main.js?6'));
             } else if ($config->stt_core == "google"){
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/recorder.js'));
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/main.js?4'));
-                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/Mp3LameEncoder.min.js'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/main.js?5'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/Mp3LameEncoder.min.js?1'));
             }
 
         }
