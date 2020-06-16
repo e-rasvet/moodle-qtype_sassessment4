@@ -59,7 +59,7 @@ class qtype_sassessment_renderer extends qtype_renderer {
                 $fileID = $vttPatchArray[1];
                 $fileName = $vttPatchArray[0].".vtt";
 
-                $fileData = $DB->get_record("files", array("filename"=>$fileName, "itemid"=>$fileID, "component"=>"question", "filearea"=>"questiontext"));
+                $fileData = $DB->get_record("files", array("filename"=>urldecode($fileName), "itemid"=>$fileID, "component"=>"question", "filearea"=>"questiontext"));
 
                 $filePatch = substr($fileData->contenthash, 0, 2)."/".substr($fileData->contenthash, 2, 2);
 
