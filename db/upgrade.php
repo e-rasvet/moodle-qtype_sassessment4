@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Upgrade code for the sassessment question type.
+ *
  * @param int $oldversion the version we are upgrading from.
  */
 function xmldb_qtype_sassessment_upgrade($oldversion) {
@@ -36,7 +37,6 @@ function xmldb_qtype_sassessment_upgrade($oldversion) {
 
     // Automatically generated Moodle v3.5.0 release upgrade line.
     // Put any upgrade step following this.
-
 
     if ($oldversion < 2019041800) {
         $table = new xmldb_table('qtype_sassessment_options');
@@ -71,22 +71,31 @@ function xmldb_qtype_sassessment_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        $field = new xmldb_field('stt_core', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('auto_score', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
         upgrade_plugin_savepoint(true, 2019041800, 'qtype', 'sassessment');
 
     }
 
-
     if ($oldversion < 2019091800) {
         $table = new xmldb_table('qtype_sassessment_options');
 
-        $field = new xmldb_field('speechtotextlang', XMLDB_TYPE_CHAR, '10', null,  XMLDB_NOTNULL, null, 'en-US', 'incorrectfeedbackformat');
+        $field = new xmldb_field('speechtotextlang', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'en-US',
+                'incorrectfeedbackformat');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         upgrade_plugin_savepoint(true, 2019091800, 'qtype', 'sassessment');
     }
-
 
     /*
      * Intermediate feedback fields
@@ -108,6 +117,49 @@ function xmldb_qtype_sassessment_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020021400, 'qtype', 'sassessment');
     }
 
+    /*
+     * Auto-score a speaking response
+     */
+
+    if ($oldversion < 2020071000) {
+        $table = new xmldb_table('qtype_sassessment_options');
+
+        $field = new xmldb_field('stt_core', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'google', 'speechtotextlang');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('auto_score', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'target_teacher', 'stt_core');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2020071000, 'qtype', 'sassessment');
+    }
+
+    /*
+     * Add open end response if fields
+     */
+    if ($oldversion < 2020081000) {
+        $table = new xmldb_table('qtype_sassessment_options');
+
+        for ($i=1; $i <=5; $i++) {
+            $field = new xmldb_field('spokenpoints'.$i.'_status', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0');
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+            $field = new xmldb_field('spokenpoints'.$i.'_words', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0');
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+            $field = new xmldb_field('spokenpoints'.$i.'_points', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0');
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2020081000, 'qtype', 'sassessment');
+    }
 
     return true;
 }

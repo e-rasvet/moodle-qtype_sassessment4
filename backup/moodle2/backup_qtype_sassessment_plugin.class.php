@@ -20,7 +20,6 @@
  * @package    qtype
  * @subpackage sassessment
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -48,15 +47,18 @@ class backup_qtype_sassessment_plugin extends backup_qtype_plugin {
 
         // Now create the qtype own structures.
         $sassessment = new backup_nested_element('sassessment', array('id'), array(
-            'show_transcript', 'save_stud_audio', 'show_analysis', 'correctfeedback', 'correctfeedbackformat', 'partiallycorrectfeedback',
-            'partiallycorrectfeedbackformat', 'incorrectfeedback', 'incorrectfeedbackformat', 'immediatefeedback', 'immediatefeedbackpercent', 'speechtotextlang', 'fb_type'));
+                'show_transcript', 'save_stud_audio', 'show_analysis', 'correctfeedback', 'correctfeedbackformat',
+                'partiallycorrectfeedback',
+                'partiallycorrectfeedbackformat', 'incorrectfeedback', 'incorrectfeedbackformat', 'immediatefeedback',
+                'immediatefeedbackpercent',
+                'speechtotextlang', 'stt_core', 'auto_score', 'fb_type'));
 
         // Now the own qtype tree.
         $pluginwrapper->add_child($sassessment);
 
         // Set source to populate the data.
         $sassessment->set_source_table('qtype_sassessment_options',
-            array('questionid' => backup::VAR_PARENTID));
+                array('questionid' => backup::VAR_PARENTID));
 
         // Don't need to annotate ids nor files.
 

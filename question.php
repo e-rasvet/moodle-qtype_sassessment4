@@ -20,10 +20,8 @@
  * @package    qtype
  * @subpackage sassessment
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -33,7 +31,6 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
  * Represents a sassessment question.
  *
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_sassessment_question extends question_graded_automatically {
@@ -48,43 +45,54 @@ class qtype_sassessment_question extends question_graded_automatically {
     public $incorrectfeedback;
     public $incorrectfeedbackformat;
     public $immediatefeedback;
+    public $stt_core;
+    public $auto_score;
+    public $spokenpoints1_status;
+    public $spokenpoints2_status;
+    public $spokenpoints3_status;
+    public $spokenpoints4_status;
+    public $spokenpoints5_status;
+    public $spokenpoints1_words;
+    public $spokenpoints2_words;
+    public $spokenpoints3_words;
+    public $spokenpoints4_words;
+    public $spokenpoints5_words;
+    public $spokenpoints1_points;
+    public $spokenpoints2_points;
+    public $spokenpoints3_points;
+    public $spokenpoints4_points;
+    public $spokenpoints5_points;
     public $immediatefeedbackpercent;
 
     public function get_expected_data() {
         return array(
-          'answer' => PARAM_RAW_TRIMMED,
-          'grade' => PARAM_RAW_TRIMMED,
-          'attachments' => question_attempt::PARAM_FILES
+                'answer' => PARAM_RAW_TRIMMED,
+                'grade' => PARAM_RAW_TRIMMED,
+                'targetAnswer' => PARAM_RAW_TRIMMED,
+                'attachments' => question_attempt::PARAM_FILES
         );
     }
 
     public function summarise_response(array $response) {
-        // TODO.
         return null;
     }
 
     public function is_complete_response(array $response) {
-        // TODO.
         return true;
     }
 
     public function get_validation_error(array $response) {
-        // TODO.
         return '';
     }
 
     public function is_same_response(array $prevresponse, array $newresponse) {
-        // TODO.
         return question_utils::arrays_same_at_key_missing_is_blank(
                 $prevresponse, $newresponse, 'answer');
     }
 
-
     public function get_correct_response() {
-        // TODO.
         return array();
     }
-
 
     /*
      * No need to grade questions without answers. Questions without answers be manual graded items.
@@ -98,16 +106,20 @@ class qtype_sassessment_question extends question_graded_automatically {
         }
     }
 
-
     public function check_file_access($qa, $options, $component, $filearea,
             $args, $forcedownload) {
-        // TODO.
         if ($component == 'question' && in_array($filearea,
-                array('correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback',
-                    'immediatefeedback', 'immediatefeedbackpercent'))) {
+                        array('correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback',
+                                'immediatefeedback', 'immediatefeedbackpercent', 'stt_core', 'auto_score',
+                                'spokenpoints1_status', 'spokenpoints1_words', 'spokenpoints1_points',
+                                'spokenpoints2_status', 'spokenpoints2_words', 'spokenpoints2_points',
+                                'spokenpoints3_status', 'spokenpoints3_words', 'spokenpoints3_points',
+                                'spokenpoints4_status', 'spokenpoints4_words', 'spokenpoints4_points',
+                                'spokenpoints5_status', 'spokenpoints5_words', 'spokenpoints5_points'
+                        ))) {
             return $this->check_combined_feedback_file_access($qa, $options, $filearea, $args);
         } else if ($component == 'question' && $filearea == 'response_attachments') {
-          return true;
+            return true;
         } else if ($component == 'question' && $filearea == 'hint') {
             return $this->check_hint_file_access($qa, $options, $args);
         } else {
@@ -122,7 +134,6 @@ class qtype_sassessment_question extends question_graded_automatically {
     }
 
     public function compute_final_grade($responses, $totaltries) {
-        // TODO.
         return 0;
     }
 }

@@ -20,9 +20,9 @@
  * @package    qtype
  * @subpackage sassessment
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['pluginname'] = 'Sassessment';
 $string['pluginname_help'] = 'Create a cloze question type with embedded response fields in the question text to enter a numeric
 or text value or select a value from a number of options.';
@@ -72,6 +72,27 @@ $string['myanswer'] = 'My answer';
 $string['teachergraded'] = 'Teacher graded';
 $string['immediatefeedback'] = 'Auto-response';
 $string['stt_core'] = 'Speech to text core';
+$string['stt_core_amazon'] = 'Amazon Transcribe';
+$string['stt_core_google'] = 'Google Speech to text';
+$string['auto_score_response'] = 'Scoring method';
+$string['target_responses_teacher'] = 'Target responses (teacher generated)';
+$string['target_responses_student'] = 'Target response (student generated)';
+$string['open_response'] = 'Open-ended response (text statistics generated)';
+$string['change_for_all_questions'] = '<a href="">Change for all exist questions</a>';
+$string['auto_score_target_answer'] = 'Enter the text that will be spoken';
+$string['target'] = 'Student target';
+
+$string['typeofif_1'] = 'words';
+$string['typeofif_2'] = 'sentences';
+$string['typeofif_3'] = 'words per sentence';
+$string['typeofif_4'] = 'long words with 6 or more letters';
+$string['typeofif_5'] = 'unique words';
+
+$string['if'] = 'If';
+$string['are_spoken'] = 'are spoken, then assign';
+$string['points'] = 'points';
+$string['pointsSectionHeader'] = 'Points in this section should add up to 100 points total';
+
 
 
 

@@ -1,6 +1,6 @@
-require(['jquery'], function($) {
+require(['jquery'], function ($) {
     return {
-        init: function() {
+        init: function () {
             console.log("Ready for work!!!");
         }
     }

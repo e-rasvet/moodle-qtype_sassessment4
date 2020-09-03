@@ -20,15 +20,15 @@
  * @package    qtype
  * @subpackage sassessment
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+/** @var Plugin $plugin */
 $plugin->component = 'qtype_sassessment';
-$plugin->version   = 2020021400;
+$plugin->version = 2020081000;
 
-$plugin->requires  = 2017111300; // Moodle 3.4
+$plugin->requires = 2017111300; // Moodle 3.4
 
-$plugin->maturity  = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_ALPHA;

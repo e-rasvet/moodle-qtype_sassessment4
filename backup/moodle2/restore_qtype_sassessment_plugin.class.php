@@ -20,12 +20,10 @@
  * @package    qtype
  * @subpackage sassessment
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 
 class restore_qtype_sassessment_plugin extends restore_qtype_plugin {
     /**
@@ -61,13 +59,13 @@ class restore_qtype_sassessment_plugin extends restore_qtype_plugin {
     public function process_sassessment($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
 
         // Detect if the question is created or mapped
         // "question" is the XML tag name, not the DB field name.
-        $oldquestionid   = $this->get_old_parentid('question');
-        $newquestionid   = $this->get_new_parentid('question');
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
 
         // If the question has been created by restore,
         // we need to create a "qtype_sassessment_options" record

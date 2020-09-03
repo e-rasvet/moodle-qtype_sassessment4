@@ -20,41 +20,44 @@
  * @package    qtype
  * @subpackage sassessment
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+/** @var Admin $ADMIN */
+
 if ($ADMIN->fulltree) {
 
-    $stt_core = array( "amazon" => "Amazon Transcribe", "google" => "Google Speech to text");
+    $stt_core = array("amazon" => new lang_string('stt_core_amazon', 'qtype_sassessment'),
+            "google" => new lang_string('stt_core_google', 'qtype_sassessment'));
 
-    $settings->add(new admin_setting_configselect('qtype_sassessment/stt_core',
-        new lang_string('stt_core', 'qtype_sassessment'),
-        '', 'amazon', $stt_core));
+    //$settings->add(new admin_setting_configselect('qtype_sassessment/stt_core',
+    //        new lang_string('stt_core', 'qtype_sassessment'),
+    //        new lang_string('change_for_all_questions', 'qtype_sassessment'), 'google', $stt_core));
 
-    $speechtotextlang = array( "en-US" => "US English (en-US)", "en-AU" => "Australian English (en-AU)", "en-GB" => "British English (en-GB)",
-        "fr-CA" => "Canadian French (fr-CA)", "fr-FR" => "French (fr-FR)",
-        "es-US" => "US Spanish (es-US)");
+    $speechtotextlang =
+            array("en-US" => "US English (en-US)", "en-AU" => "Australian English (en-AU)", "en-GB" => "British English (en-GB)",
+                    "fr-CA" => "Canadian French (fr-CA)", "fr-FR" => "French (fr-FR)",
+                    "es-US" => "US Spanish (es-US)");
 
     $settings->add(new admin_setting_configselect('qtype_sassessment/speechtotextlang',
-        new lang_string('speechtotextlang', 'qtype_sassessment'),
-        '', 'en-US', $speechtotextlang));
+            new lang_string('speechtotextlang', 'qtype_sassessment'),
+            '', 'en-US', $speechtotextlang));
 
-
-    $amazon_region = array( "us-east-1" => "US East (N. Virginia)", "us-east-2" => "US East (Ohio)", "us-west-2" => "US West (Oregon)",
-        "ap-southeast-2" => "Asia Pacific (Sydney)", "ca-central-1" => "Canada (Central)",
-        "eu-west-1" => "EU (Ireland)");
+    $amazon_region =
+            array("us-east-1" => "US East (N. Virginia)", "us-east-2" => "US East (Ohio)", "us-west-2" => "US West (Oregon)",
+                    "ap-southeast-2" => "Asia Pacific (Sydney)", "ca-central-1" => "Canada (Central)",
+                    "eu-west-1" => "EU (Ireland)");
 
     $settings->add(new admin_setting_configselect('qtype_sassessment/amazon_region',
-        new lang_string('amazon_region', 'qtype_sassessment'),
-        '', 'ap-southeast-2', $amazon_region));
+            new lang_string('amazon_region', 'qtype_sassessment'),
+            '', 'ap-southeast-2', $amazon_region));
 
     $settings->add(new admin_setting_configtext('qtype_sassessment/amazon_accessid',
-        get_string('amazon_accessid', 'qtype_sassessment'), '', '', PARAM_TEXT));
+            get_string('amazon_accessid', 'qtype_sassessment'), '', '', PARAM_TEXT));
 
     $settings->add(new admin_setting_configtext('qtype_sassessment/amazon_secretkey',
-        get_string('amazon_secretkey', 'qtype_sassessment'), '', '', PARAM_TEXT));
+            get_string('amazon_secretkey', 'qtype_sassessment'), '', '', PARAM_TEXT));
 
 }

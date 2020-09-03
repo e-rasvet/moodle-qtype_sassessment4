@@ -37,14 +37,14 @@ function uploadFile(file, repo_id, itemid, title, ctx_id, btn) {
             this.btn.removeAttribute("disabled");
         }
     }
-    xhr.upload.addEventListener("progress", function(evt) {
+    xhr.upload.addEventListener("progress", function (evt) {
         if (evt.lengthComputable) {
             var percentComplete = evt.loaded / evt.total;
             percentComplete = parseInt(percentComplete * 100);
-            xhr.btn.innerHTML = '<i class="fa fa-upload" style="background: linear-gradient(to top, white '+percentComplete+'%, #a4c9e9 '+percentComplete+'% 100%);\n' +
+            xhr.btn.innerHTML = '<i class="fa fa-upload" style="background: linear-gradient(to top, white ' + percentComplete + '%, #a4c9e9 ' + percentComplete + '% 100%);\n' +
                 '    -webkit-background-clip: text;\n' +
                 '    -webkit-text-fill-color: transparent;\n' +
-                '    display: initial;"></i>  Uploading... ('+percentComplete+'%)';
+                '    display: initial;"></i>  Uploading... (' + percentComplete + '%)';
         }
     }, false);
     xhr.send(formdata);
@@ -121,6 +121,10 @@ function recBtn(ev) {
         recStatus[id].lang = speechLang;
         recStatus[id].btn = btn;
         recStatus[id].qid = btn.getAttribute('qid');
+        recStatus[id].usageid = btn.getAttribute('usageid');
+        recStatus[id].slot = btn.getAttribute('slot');
+        recStatus[id].auto_score = btn.getAttribute('auto_score');
+        recStatus[id].targetanswerid = document.getElementById(btn.getAttribute('targetanswerid'));
         recStatus[id].ans = document.getElementById(btn.getAttribute('answername'));
         recStatus[id].ansDiv = document.getElementById(btn.getAttribute('answerDiv'));
         recStatus[id].grade = document.getElementById(btn.getAttribute('gradename'));
@@ -173,13 +177,19 @@ function recBtn(ev) {
             var mediapercent = this.mediapercent;
             var mediaelement = this.mediaelement;
 
+            if(this.targetanswerid === null){
+                var targetAnswer = "";
+            } else {
+                var targetAnswer = this.targetanswerid.value;
+            }
+
             this.grade.value = 'Updating...';
 
-            $.post(typeRoot + "/ajax-score.php", {qid: this.qid, ans: this.ans.value},
+            $.post(typeRoot + "/ajax-score.php", {usageid: this.usageid, targetAnswer: targetAnswer, slot: this.slot, ans: this.ans.value},
                 function (data) {
                     grade.value = JSON.parse(data).gradePercent;
 
-                    if ((parseInt(grade.value) >= parseInt(mediapercent)) && mediapercent != 0){
+                    if ((parseInt(grade.value) >= parseInt(mediapercent)) && mediapercent != 0) {
                         medianame.style.display = "block";
                         mediaelement.play();
                     } else {
@@ -195,27 +205,27 @@ function recBtn(ev) {
         btn.innerHTML = '<i class="fa fa-stop-circle"></i> Stop';
 
         recordingBtnText = setInterval(function () {
-                    var text = 'Stop';
-                    var dotsText = "";
+            var text = 'Stop';
+            var dotsText = "";
 
-                    for (var i = 1; i <= dotsCount; i++) {
-                        dotsText = dotsText + ".";
-                    }
+            for (var i = 1; i <= dotsCount; i++) {
+                dotsText = dotsText + ".";
+            }
 
-                    if (colorFlashBtn != "white") {
-                        colorFlashBtn = "white";
-                    } else {
-                        colorFlashBtn = "brown";
-                    }
+            if (colorFlashBtn != "white") {
+                colorFlashBtn = "white";
+            } else {
+                colorFlashBtn = "brown";
+            }
 
-                    btn.innerHTML = '<i class="fa fa-stop-circle" style="color:'+colorFlashBtn+'"></i> ' + text + dotsText;
+            btn.innerHTML = '<i class="fa fa-stop-circle" style="color:' + colorFlashBtn + '"></i> ' + text + dotsText;
 
-                    if (dotsCount > 4) {
-                        dotsCount = 1;
-                    } else {
-                        dotsCount++;
-                    }
-                }, 500);
+            if (dotsCount > 4) {
+                dotsCount = 1;
+            } else {
+                dotsCount++;
+            }
+        }, 500);
 
         recStatus[id].ans.value = '';
         recStatus[id].grade.value = '';

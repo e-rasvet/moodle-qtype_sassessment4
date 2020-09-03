@@ -20,10 +20,8 @@
  * @package    qtype
  * @subpackage sassessment
  * @copyright  2018 Kochi-Tech.ac.jp
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,23 +29,28 @@ require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/question/type/sassessment/question.php');
 
-
 /**
  * The sassessment question type.
  *
  * @copyright  THEYEAR YOURNAME (YOURCONTACTINFO)
-
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_sassessment extends question_type {
 
     /**
      * data used by export_to_xml (among other things possibly
+     *
      * @return array
      */
     public function extra_question_fields() {
         return array('qtype_sassessment_options', 'show_transcript', 'save_stud_audio', 'show_analysis', 'speechtotextlang',
-            'immediatefeedback', 'immediatefeedbackpercent');
+                'immediatefeedback', 'immediatefeedbackpercent', 'stt_core', 'auto_score',
+                'spokenpoints1_status', 'spokenpoints1_words', 'spokenpoints1_points',
+                'spokenpoints2_status', 'spokenpoints2_words', 'spokenpoints2_points',
+                'spokenpoints3_status', 'spokenpoints3_words', 'spokenpoints3_points',
+                'spokenpoints4_status', 'spokenpoints4_words', 'spokenpoints4_points',
+                'spokenpoints5_status', 'spokenpoints5_words', 'spokenpoints5_points'
+        );
     }
 
     public function move_files($questionid, $oldcontextid, $newcontextid) {
@@ -75,40 +78,49 @@ class qtype_sassessment extends question_type {
         $context = $formdata->context;
         $result = new stdClass();
 
+
         $this->save_question_answers($formdata);
 
         {
-          $options = $DB->get_record('qtype_sassessment_options', array('questionid' => $formdata->id));
-          if (!$options) {
-              $options = new stdClass();
-              $options->questionid = $formdata->id;
-              $options->correctfeedback = '';
-              $options->partiallycorrectfeedback = '';
-              $options->incorrectfeedback = '';
-              $options->immediatefeedback = '';
-              $options->immediatefeedbackpercent = '';
-              $options->id = $DB->insert_record('qtype_sassessment_options', $options);
-          }
+            $options = $DB->get_record('qtype_sassessment_options', array('questionid' => $formdata->id));
+            if (!$options) {
+                $options = new stdClass();
+                $options->questionid = $formdata->id;
+                $options->correctfeedback = '';
+                $options->partiallycorrectfeedback = '';
+                $options->incorrectfeedback = '';
+                $options->immediatefeedback = '';
+                $options->immediatefeedbackpercent = '';
+                $options->auto_score = 'words';
+                $options->stt_core = 'google';
+                $options->id = $DB->insert_record('qtype_sassessment_options', $options);
+            }
 
-          $options->show_transcript = (int)$formdata->show_transcript;
-          $options->save_stud_audio = (int)$formdata->save_stud_audio;
-          $options->show_analysis = (int)$formdata->show_analysis;
-          $options->speechtotextlang = $formdata->speechtotextlang;
-          $options->immediatefeedback = $formdata->immediatefeedback;
-          $options->immediatefeedbackpercent = (int)$formdata->immediatefeedbackpercent;
+            $options->show_transcript = (int) $formdata->show_transcript;
+            $options->save_stud_audio = (int) $formdata->save_stud_audio;
+            $options->show_analysis = (int) $formdata->show_analysis;
+            $options->speechtotextlang = $formdata->speechtotextlang;
+            $options->immediatefeedback = $formdata->immediatefeedback;
+            $options->auto_score = $formdata->auto_score;
+            $options->stt_core = $formdata->stt_core;
+            $options->immediatefeedbackpercent = (int) $formdata->immediatefeedbackpercent;
 
-          $options->fb_type = $formdata->fb_type;
+            $options->fb_type = $formdata->fb_type;
 
-          $options = $this->save_combined_feedback_helper($options, $formdata, $context, true);
+            for($i=1; $i <= 5; $i++) {
+                $options->{"spokenpoints" . $i . "_status"} = empty($formdata->{"spokenpoints" . $i . "_status"}) ? 0 : 1;
+                $options->{"spokenpoints" . $i . "_words"} = empty($formdata->{"spokenpoints" . $i . "_words"}) ? 0 : $formdata->{"spokenpoints" . $i . "_words"};
+                $options->{"spokenpoints" . $i . "_points"} = empty($formdata->{"spokenpoints" . $i . "_points"}) ? 0 : $formdata->{"spokenpoints" . $i . "_points"};
+            }
 
-          $DB->update_record('qtype_sassessment_options', $options);
+            $options = $this->save_combined_feedback_helper($options, $formdata, $context, true);
+            $DB->update_record('qtype_sassessment_options', $options);
 
         }
     }
 
-
     protected function is_answer_empty($questiondata, $key) {
-       return html_is_blank($questiondata->answer[$key]['text']) || trim($questiondata->answer[$key]) == '';
+        return html_is_blank($questiondata->answer[$key]['text']) || trim($questiondata->answer[$key]) == '';
     }
 
     protected function fill_answer_fields($answer, $questiondata, $key, $context) {
@@ -133,22 +145,19 @@ class qtype_sassessment extends question_type {
     }
 
     public function get_random_guess_score($questiondata) {
-        // TODO.
         return 0;
     }
 
     public function get_possible_responses($questiondata) {
-        // TODO.
         return array();
     }
 
     public function feedback_types() {
         return array(
-            'percent' => get_string('percent_score', 'qtype_sassessment'),
-            'points' => get_string('points_score', 'qtype_sassessment'),
+                'percent' => get_string('percent_score', 'qtype_sassessment'),
+                'points' => get_string('points_score', 'qtype_sassessment'),
         );
     }
-
 
     /**
      * Create a question from reading in a file in Moodle xml format
@@ -170,18 +179,31 @@ class qtype_sassessment extends question_type {
         $question->itemsettings = [];
         if (isset($data['#']['sassessmentsetting'])) {
             foreach ($data['#']['sassessmentsetting'] as $key => $setxml) {
-                $question->itemsettings[$key]['show_transcript'] = $format->getpath($setxml, array('#', 'show_transcript', 0, '#'), 0);
-                $question->itemsettings[$key]['save_stud_audio'] = $format->getpath($setxml, array('#', 'save_stud_audio', 0, '#'), 0);
+                $question->itemsettings[$key]['show_transcript'] =
+                        $format->getpath($setxml, array('#', 'show_transcript', 0, '#'), 0);
+                $question->itemsettings[$key]['save_stud_audio'] =
+                        $format->getpath($setxml, array('#', 'save_stud_audio', 0, '#'), 0);
                 $question->itemsettings[$key]['show_analysis'] = $format->getpath($setxml, array('#', 'show_analysis', 0, '#'), 0);
-                $question->itemsettings[$key]['correctfeedback'] = $format->getpath($setxml, array('#', 'correctfeedback', 0, '#'), 0);
-                $question->itemsettings[$key]['correctfeedbackformat'] = $format->getpath($setxml, array('#', 'correctfeedbackformat', 0, '#'), 0);
-                $question->itemsettings[$key]['partiallycorrectfeedback'] = $format->getpath($setxml, array('#', 'partiallycorrectfeedback', 0, '#'), 0);
-                $question->itemsettings[$key]['partiallycorrectfeedbackformat'] = $format->getpath($setxml, array('#', 'partiallycorrectfeedbackformat', 0, '#'), 0);
-                $question->itemsettings[$key]['incorrectfeedback'] = $format->getpath($setxml, array('#', 'incorrectfeedback', 0, '#'), 0);
-                $question->itemsettings[$key]['incorrectfeedbackformat'] = $format->getpath($setxml, array('#', 'incorrectfeedbackformat', 0, '#'), 0);
-                $question->itemsettings[$key]['immediatefeedback'] = $format->getpath($setxml, array('#', 'immediatefeedback', 0, '#'), 0);
-                $question->itemsettings[$key]['immediatefeedbackpercent'] = $format->getpath($setxml, array('#', 'immediatefeedbackpercent', 0, '#'), 0);
-                $question->itemsettings[$key]['speechtotextlang'] = $format->getpath($setxml, array('#', 'speechtotextlang', 0, '#'), 0);
+                $question->itemsettings[$key]['correctfeedback'] =
+                        $format->getpath($setxml, array('#', 'correctfeedback', 0, '#'), 0);
+                $question->itemsettings[$key]['correctfeedbackformat'] =
+                        $format->getpath($setxml, array('#', 'correctfeedbackformat', 0, '#'), 0);
+                $question->itemsettings[$key]['partiallycorrectfeedback'] =
+                        $format->getpath($setxml, array('#', 'partiallycorrectfeedback', 0, '#'), 0);
+                $question->itemsettings[$key]['partiallycorrectfeedbackformat'] =
+                        $format->getpath($setxml, array('#', 'partiallycorrectfeedbackformat', 0, '#'), 0);
+                $question->itemsettings[$key]['incorrectfeedback'] =
+                        $format->getpath($setxml, array('#', 'incorrectfeedback', 0, '#'), 0);
+                $question->itemsettings[$key]['incorrectfeedbackformat'] =
+                        $format->getpath($setxml, array('#', 'incorrectfeedbackformat', 0, '#'), 0);
+                $question->itemsettings[$key]['immediatefeedback'] =
+                        $format->getpath($setxml, array('#', 'immediatefeedback', 0, '#'), 0);
+                $question->itemsettings[$key]['immediatefeedbackpercent'] =
+                        $format->getpath($setxml, array('#', 'immediatefeedbackpercent', 0, '#'), 0);
+                $question->itemsettings[$key]['speechtotextlang'] =
+                        $format->getpath($setxml, array('#', 'speechtotextlang', 0, '#'), 0);
+                $question->itemsettings[$key]['stt_core'] = $format->getpath($setxml, array('#', 'stt_core', 0, '#'), 0);
+                $question->itemsettings[$key]['auto_score'] = $format->getpath($setxml, array('#', 'auto_score', 0, '#'), 0);
                 $question->itemsettings[$key]['fb_type'] = $format->getpath($setxml, array('#', 'fb_type', 0, '#'), 0);
             }
         }
@@ -198,7 +220,6 @@ class qtype_sassessment extends question_type {
      * @return string
      */
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
-        global $CFG;
         $pluginmanager = core_plugin_manager::instance();
         $question->options->itemsettings = json_decode($question->options->itemsettings);
 
@@ -211,12 +232,15 @@ class qtype_sassessment extends question_type {
             $output .= '        <correctfeedback>' . $set->correctfeedback . "</correctfeedback>\n";
             $output .= '        <correctfeedbackformat>' . $set->correctfeedbackformat . "</correctfeedbackformat>\n";
             $output .= '        <partiallycorrectfeedback>' . $set->partiallycorrectfeedback . "</partiallycorrectfeedback>\n";
-            $output .= '        <partiallycorrectfeedbackformat>' . $set->partiallycorrectfeedbackformat . "</partiallycorrectfeedbackformat>\n";
+            $output .= '        <partiallycorrectfeedbackformat>' . $set->partiallycorrectfeedbackformat .
+                    "</partiallycorrectfeedbackformat>\n";
             $output .= '        <incorrectfeedback>' . $set->incorrectfeedback . "</incorrectfeedback>\n";
             $output .= '        <incorrectfeedbackformat>' . $set->incorrectfeedbackformat . "</incorrectfeedbackformat>\n";
             $output .= '        <immediatefeedback>' . $set->immediatefeedback . "</immediatefeedback>\n";
             $output .= '        <immediatefeedbackpercent>' . $set->immediatefeedbackpercent . "</immediatefeedbackpercent>\n";
             $output .= '        <speechtotextlang>' . $set->speechtotextlang . "</speechtotextlang>\n";
+            $output .= '        <stt_core>' . $set->stt_core . "</stt_core>\n";
+            $output .= '        <auto_score>' . $set->auto_score . "</auto_score>\n";
             $output .= '        <fb_type>' . $set->fb_type . "</fb_type>\n";
             $output .= "     </sassessmentsetting>\n";
         }

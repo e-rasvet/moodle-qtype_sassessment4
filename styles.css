@@ -66,7 +66,7 @@
 
 }
 
-.button.button-xl.disabled, .button.button-xl:disabled, button.button-xl.disabled, button.button-xl:disabled:disabled{
+.button.button-xl.disabled, .button.button-xl:disabled, button.button-xl.disabled, button.button-xl:disabled:disabled {
     background-color: #0068c3;
     border-top-color: #1982dd;
     border-bottom-color: #0068c3;
