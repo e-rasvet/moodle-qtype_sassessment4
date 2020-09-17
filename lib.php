@@ -144,6 +144,7 @@ function qtype_sassessment_compare_answer($ans, $qa, $targetAnswer = null) {
      * Auto response analyzer code "open_response"
      */
     if ($question->auto_score == "open_response") {
+        $result["debug"][] = "auto_score: open_response";
         /*
          * Open response auto score
          */
@@ -155,11 +156,18 @@ function qtype_sassessment_compare_answer($ans, $qa, $targetAnswer = null) {
             if ($question->{'spokenpoints' . $i . '_status'} == 1) {
                 $maxPoints += $question->{'spokenpoints' . $i . '_points'};
 
-                if (qtype_sassessment_get_words_by_ifId($ans, $i) >= $question->{'spokenpoints' . $i . '_words'}) {
+                $answStat = qtype_sassessment_printanalizeform($ans);
+                $result["debug"][] = "answerStat: " . json_encode($answStat);
+                $result["debug"][] = "qtype_sassessment_get_words_by_ifId: " . qtype_sassessment_get_words_by_ifId($answStat, $i);
+                $result["debug"][] = 'spokenpoints' . $i . '_words' . ": " . $question->{'spokenpoints' . $i . '_words'};
+
+                if (qtype_sassessment_get_words_by_ifId($answStat, $i) >= $question->{'spokenpoints' . $i . '_words'}) {
                     $totalPoints += $question->{'spokenpoints' . $i . '_points'};
                 }
             }
         }
+
+        $result["debug"][] = "totalPoints: {$totalPoints}";
 
         if ($totalPoints > 0) {
             $result["gradePercent"] = ($totalPoints / $maxPoints) * 100;

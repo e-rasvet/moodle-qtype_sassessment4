@@ -347,10 +347,10 @@ class qtype_sassessment_renderer extends qtype_renderer {
                     'style' => 'border: 0px; background-color: transparent;',
             );
 
-            if (count($question->questions) > 0) {  // Show grade if sample answers exist only
+            if (count($question->questions) > 0 || $question->auto_score == "target_student" || $question->auto_score == "open_response") {  // Show grade if sample answers exist only
                 $input = html_writer::empty_tag('input', $inputattributes);
 
-                if (!$options->readonly && !empty($q->answer)) {
+                if ((!$options->readonly && !empty($q->answer)) || (!$options->readonly && $question->auto_score == "target_student")  || (!$options->readonly && $question->auto_score == "open_response")) {
                     $result .= html_writer::start_tag('div', array('class' => 'ablock form-inline'));
 
                     $result .= html_writer::tag('label', get_string('score', 'qtype_sassessment',
@@ -515,6 +515,7 @@ require(["jquery"], function(min) {
         /*
          * TODO Add choice "Auto-score method and Choices"
          */
+
         $grade = qtype_sassessment_compare_answer($ans, $qa);
 
         $grade['gradePercent'] = $qa->get_last_qt_var('grade');  /*  Change grade??!! */

@@ -99,7 +99,7 @@ class qtype_sassessment_question extends question_graded_automatically {
      */
     public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
         $question = $qa->get_question();
-        if (empty(count($question->questions))) {
+        if (empty(count($question->questions)) && $question->auto_score == "target_teacher") {
             return question_engine::make_behaviour('manualgraded', $qa, $preferredbehaviour);
         } else {
             return question_engine::make_archetypal_behaviour($preferredbehaviour, $qa);
