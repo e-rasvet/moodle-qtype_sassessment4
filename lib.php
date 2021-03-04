@@ -161,16 +161,20 @@ function qtype_sassessment_compare_answer($ans, $qa, $targetAnswer = null) {
                 $result["debug"][] = "qtype_sassessment_get_words_by_ifId: " . qtype_sassessment_get_words_by_ifId($answStat, $i);
                 $result["debug"][] = 'spokenpoints' . $i . '_words' . ": " . $question->{'spokenpoints' . $i . '_words'};
 
-                if (qtype_sassessment_get_words_by_ifId($answStat, $i) >= $question->{'spokenpoints' . $i . '_words'}) {
-                    $totalPoints += $question->{'spokenpoints' . $i . '_points'};
-                }
+                //if (qtype_sassessment_get_words_by_ifId($answStat, $i) >= $question->{'spokenpoints' . $i . '_words'}) {
+                $wordsPercent = (qtype_sassessment_get_words_by_ifId($answStat, $i) / $question->{'spokenpoints' . $i . '_words'});
+                $wordsPercent = ($wordsPercent <= 1) ? $wordsPercent : 1;
+                $totalPoints += round($wordsPercent * $question->{'spokenpoints' . $i . '_points'});
+
+                //$totalPoints += $question->{'spokenpoints' . $i . '_points'};
+                //}
             }
         }
 
         $result["debug"][] = "totalPoints: {$totalPoints}";
 
         if ($totalPoints > 0) {
-            $result["gradePercent"] = ($totalPoints / $maxPoints) * 100;
+            $result["gradePercent"] = round(($totalPoints / $maxPoints) * 100);
         } else {
             $result["gradePercent"] = 0;
         }

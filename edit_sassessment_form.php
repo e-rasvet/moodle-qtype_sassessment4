@@ -118,7 +118,6 @@ class qtype_sassessment_edit_form extends question_edit_form {
         $mform->addElement('hidden', 'fb_type', 0);
 
         $this->add_per_answer_fields($mform, '{no}', question_bank::fraction_options_full(), 1, 3);
-
         $this->add_combined_feedback_fields(false);
 
         /*
