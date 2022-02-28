@@ -2,13 +2,13 @@
 <project version="4">
   <component name="SshConfigs">
     <configs>
-      <sshConfig authType="PASSWORD" host="vps44784.inmotionhosting.com" id="9ec2e5f9-bb0d-442b-834a-88a66ea7fe29" port="22" customName="fltrk.biz" nameFormat="CUSTOM" username="fltrcb6">
+      <sshConfig authType="PASSWORD" connectionConfig="{&quot;serverAliveInterval&quot;:300}" host="vps44784.inmotionhosting.com" id="9ec2e5f9-bb0d-442b-834a-88a66ea7fe29" port="22" customName="fltrk.biz" nameFormat="CUSTOM" username="fltrcb6">
         <option name="customName" value="fltrk.biz" />
       </sshConfig>
-      <sshConfig host="biz214.inmotionhosting.com" id="2cbf8787-acf6-4b84-a7f1-350701613184" keyPath="$USER_HOME$/.ssh/id_rsa2020.ppk" port="2222" customName="fltrc.net" nameFormat="CUSTOM" username="fltrcn5">
+      <sshConfig connectionConfig="{&quot;serverAliveInterval&quot;:300}" host="biz214.inmotionhosting.com" id="2cbf8787-acf6-4b84-a7f1-350701613184" keyPath="$USER_HOME$/.ssh/id_rsa2020.ppk" port="2222" customName="fltrc.net" nameFormat="CUSTOM" username="fltrcn5">
         <option name="customName" value="fltrc.net" />
       </sshConfig>
-      <sshConfig host="172.105.193.141" id="20c81463-1e95-41c1-a867-6d36e514c191" keyPath="$USER_HOME$/.ssh/private-open-ssh" port="7822" customName="172.105.193.141" nameFormat="CUSTOM" username="smart">
+      <sshConfig connectionConfig="{&quot;serverAliveInterval&quot;:300}" host="172.105.193.141" id="20c81463-1e95-41c1-a867-6d36e514c191" keyPath="$USER_HOME$/.ssh/private-open-ssh" port="7822" customName="172.105.193.141" nameFormat="CUSTOM" username="smart">
         <option name="customName" value="172.105.193.141" />
       </sshConfig>
     </configs>

@@ -119,9 +119,9 @@ function qtype_sassessment_compare_answer($ans, $qa, $targetAnswer = null) {
         }
     }
 
-    /*if ($maxpF > 90) {
+    if ($maxpF > 92) {
         $maxpF = 100;
-    }*/
+    }
 
     $result = array(
             "gradePercent" => round($maxpF),
@@ -181,6 +181,8 @@ function qtype_sassessment_compare_answer($ans, $qa, $targetAnswer = null) {
 
         $result["grade"] = round($result["gradePercent"] / 100, 2);
     }
+
+    qtype_sassessment_log("--compare naswers: " . json_encode($result));
 
     return $result;
 }
@@ -674,5 +676,21 @@ function getMimeType($ext) {
     }
     return $mime;
 
+}
+
+function qtype_sassessment_is_ios()
+{
+    if (strstr($_SERVER['HTTP_USER_AGENT'], "iPhone") || strstr($_SERVER['HTTP_USER_AGENT'], "iPad"))
+        return true;
+    else
+        return false;
+}
+
+function qtype_sassessment_log($text){
+    global $CFG;
+
+    $file = $CFG->dirroot . '/question/type/sassessment/stt_log.txt';
+    $message = date("Y-m-d H:i:s") . "::" . $text . PHP_EOL;
+    file_put_contents($file, $message, FILE_APPEND);
 }
 

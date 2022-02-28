@@ -189,6 +189,13 @@ class qtype_sassessment_renderer extends qtype_renderer {
             $targetAnswerID = $qa->get_qt_field_name('targetAnswer');
 
 
+            if ($question->stt_core == "google" && qtype_sassessment_is_ios()) {
+                $recordingFunction = 'recBtnGoogleAPI(event);';
+            } else {
+                $recordingFunction = 'recBtn(event);';
+            }
+
+
             $btnattributes = array(
                     'name' => $btnname,
                     'id' => $btnname,
@@ -210,7 +217,7 @@ class qtype_sassessment_renderer extends qtype_renderer {
                     'amazon_accessid' => $config->amazon_accessid,
                 //'amazon_secretkey' => $config->amazon_secretkey,
                     'amazon_secretkey' => '98734ufnsdkweu23488234bmsbdfnmb',
-                    'onclick' => 'recBtn(event);',
+                    'onclick' => $recordingFunction,
                     'type' => 'button',
                     'options' => json_encode(array(
                             'repo_id' => $this->get_repo_id(),
@@ -294,11 +301,13 @@ class qtype_sassessment_renderer extends qtype_renderer {
                 $result .= html_writer::script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js");
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/lame.js?1'));
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/main.js?6'));
+            } else if (qtype_sassessment_is_ios()) {
+                $result .= html_writer::script(null, "https://hokulele.us/speechtotext/js/WebAudioTrack.js"); /* IOS integration */
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/mainAPI.js?1')); /* IOS integration */
             } else if ($question->stt_core == "google") { //$config->stt_core == "google") {
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/recorder.js'));
                 $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/main.js?5'));
-                $result .= html_writer::script(null,
-                        new moodle_url('/question/type/sassessment/js/google/Mp3LameEncoder.min.js?1'));
+                $result .= html_writer::script(null, new moodle_url('/question/type/sassessment/js/google/Mp3LameEncoder.min.js?1'));
             }
 
         } else {
@@ -365,10 +374,17 @@ class qtype_sassessment_renderer extends qtype_renderer {
         /*
          * IOS app integration code START
          */
+
+        if ($question->stt_core == "google") {
+            //if ($question->stt_core == "google" && qtype_sassessment_is_ios()) {
+            //}
+            qtype_sassessment_log("Recorder Initialization: " . json_encode($btnattributes));
+        }
         /*
          * This code works with voiceshadow module only!
          */
-        if (function_exists("voiceshadow_is_ios") && $question->stt_core == "google") {
+        //if ($question->stt_core == "google") {
+            /*
             if (voiceshadow_is_ios() && !$options->readonly && file_exists($CFG->dirroot . '/mod/voiceshadow/ajax-apprecord.php')) {
                 $time = time();
                 $result .= html_writer::start_tag("a",
@@ -432,11 +448,16 @@ require(["jquery"], function(min) {
 });
 ');
 
-                /*
-                 * IOS app integration code END
-                 */
+
             }
-        }
+            */
+
+
+
+            /*
+             * IOS app integration code END
+             */
+
 
         /*
          * JS code
